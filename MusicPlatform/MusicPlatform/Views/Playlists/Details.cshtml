@@ -1,0 +1,294 @@
+﻿@model MusicPlatform.Models.Playlist
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
+    <style>
+        .slick-prev,
+        .slick-next {
+            color: white;
+            background-color: transparent;
+            border: none;
+            font-size: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .slick-prev {
+            left: -10px;
+        }
+        .slick-next {
+            right: -10px;
+        }
+        .slick-prev::before {
+            content: "<";
+            color: white;
+            font-size: 25px;
+        }
+        .slick-next::before {
+            content: ">";
+            color: white;
+            font-size: 25px;
+        }
+        .paginate_button {
+            color: white;
+            text-decoration: none;
+            padding: 0 7px;
+        }
+        .paginate_button:hover {
+            color: white;
+        }
+        .highlightedRow {
+            background-color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h4>Playlist Details</h4>
+        <hr />
+
+        <div class="btn btn-dark" style="width: 100%; border-radius: 0; padding: 20px">
+
+            <p style="font-size: 40px; padding: 0; margin: 0;">
+                @Html.DisplayFor(model => model.Title)
+            </p>
+
+            <p style="font-size: 20px; padding: 0; margin: 0;">
+                by @Html.DisplayFor(model => model.Listener.Name)
+                <img src="@Model.Listener.PhotoUrl" style="width: 60px; height: 60px; border-radius: 50%;" />
+                @if (User.Identity.IsAuthenticated && Model.Listener.Email == User.Identity.Name)
+                {
+                    <span style="display:inline-block; padding: 0; margin: 0; font-size: 14px;">
+                        @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+                    </span>
+                }
+            </p>
+        </div>
+
+    </div>
+
+    <br />
+
+    <div style="width: 100%; text-align: center">
+        <div class="video-slider" style="padding: 0 10px;">
+            @foreach (var song in Model.Songs)
+            {
+                <div>
+                    <iframe src="https://www.youtube.com/embed/@song.VideoURL" frameborder="0" allowfullscreen></iframe>
+                </div>
+            }
+        </div>
+    </div>
+
+    <br />
+    <br />
+
+
+    <div data-song-index="0" class="btn btn-dark audio-play-btn">
+        Play Playlist
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table id="songsOfPlaylistTable" class="table">
+            <thead>
+                <tr>
+                    <th>Album Art</th>
+                    <th>Title</th>
+                    <th>Album</th>
+                    <th>Artist</th>
+                    <th>Play</th>
+                    <th>Like</th>
+                    <th>See More</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (item, index) in Model.Songs.Select((song, index) => (song, index)))
+                {
+                    <tr id="row-@index">
+                        <td>
+                            <a href="/Albums/Details/@item.Album.Id"><img src="@item.Album.AlbumArtURL" style="width: 70px;" /></a>
+                        </td>
+                        <td>
+                            <a href="/Songs/Details/@item.Id">@Html.DisplayFor(modelItem => item.Title)</a>
+                        </td>
+                        <td>
+                            <a href="/Albums/Details/@item.Album.Id">@Html.DisplayFor(modelItem => item.Album.Title)</a>
+                        </td>
+                        <td>
+                            <a href="/Artists/Details/@item.Artist.Id">@Html.DisplayFor(modelItem => item.Artist.Name)</a>
+                        </td>
+                        <td>
+                            <div data-song-index="@index" class="btn btn-dark audio-play-btn" id="youtube-audio-@index">
+                                &#x25B7;
+                            </div>
+                        </td>
+                        <td>
+                            @if (User.IsInRole("Listener") && item.LikesFromListeners.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                            {
+                                using (Html.BeginForm("Unlike", "Songs", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9829;</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Like", "Songs", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9825;</button>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <a href="/Songs/Details/@item.Id" class="btn btn-dark">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+
+
+    <br />
+
+    @if (User.Identity.IsAuthenticated && Model.Listener.Email == User.Identity.Name && Model.Title != "Liked Songs")
+    {
+        <div style="display: inline-block; min-width: 400px; border: 1px solid #cececeff; padding: 20px; border-radius: 4px;">
+            @using (Html.BeginForm("AddSongToPlaylist", "Playlists", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.DropDownList("selectedSongId", (SelectList)ViewBag.Songs, "Select a Song", new { @class = "form-control btn btn-dark" })
+                <br />
+                @Html.Hidden("playlistId", Model.Id)
+                <br />
+                <button class="btn btn-dark" type="submit">Add</button>
+            }
+        </div>
+
+        <div style="display: inline-block; min-width: 400px; border: 1px solid #cececeff; padding: 20px; border-radius: 4px;">
+            @using (Html.BeginForm("RemoveSongFromPlaylist", "Playlists", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.DropDownList("selectedSongId", new SelectList(Model.Songs, "Id", "Title"), "Select a Song", new { @class = "form-control btn btn-dark" })
+                <br />
+                @Html.Hidden("playlistId", Model.Id)
+                <br />
+                <button class="btn btn-dark" type="submit">Remove</button>
+            }
+        </div>
+    }
+
+
+    <br /><br />
+
+</body>
+</html>
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var songs = @Html.Raw(Json.Encode(Model.Songs.Select(s => new { s.AudioURL })));
+        var currentSongIndex = 0;
+        var previousSongIndex = -1; // Initialize with an invalid index
+        var isPlaying = false; // Flag to keep track of whether the song is currently playing
+
+        function onYouTubeIframeAPIReady() {
+
+            var buttons = document.querySelectorAll(".audio-play-btn");
+            buttons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    currentSongIndex = parseInt(this.getAttribute("data-song-index"));
+                    if (currentSongIndex !== previousSongIndex) {
+                        r.loadVideoById(songs[currentSongIndex].AudioURL);
+                        r.playVideo();
+                        isPlaying = true;
+                    } else {
+                        if (isPlaying) {
+                            r.pauseVideo();
+                            isPlaying = false;
+                        } else {
+                            r.playVideo();
+                            isPlaying = true;
+                        }
+                    }
+                    previousSongIndex = currentSongIndex;
+                });
+            });
+
+            var e = document.getElementById("youtube-audio-" + currentSongIndex);
+            var a = document.createElement("div");
+            a.setAttribute("id", "youtube-player");
+            e.appendChild(a);
+            e.onclick = function () {
+                r.getPlayerState() === YT.PlayerState.PLAYING || r.getPlayerState() === YT.PlayerState.BUFFERING ? (r.pauseVideo(), o(!1)) : (r.playVideo(), o(!0));
+            };
+           var r = new YT.Player("youtube-player", {
+                height: "0",
+                width: "0",
+                videoId: songs[currentSongIndex].AudioURL,
+               playerVars: {
+                    autoplay: 0,
+                    loop: 1
+                },
+                events: {
+                    onReady: function (event) {
+                        event.target.setPlaybackQuality("small");
+                    },
+                    onStateChange: function (event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            currentSongIndex = (currentSongIndex + 1) % songs.length;
+                            r.loadVideoById(songs[currentSongIndex].AudioURL);
+                            r.playVideo();
+                            isPlaying = true; // Set isPlaying to true when the next song starts playing
+                       }
+
+                        var previousHighlightedRow = document.querySelector(".highlightedRow");
+                        if (previousHighlightedRow) {
+                           previousHighlightedRow.classList.remove("highlightedRow");
+                       }
+
+                        var currentRow = document.getElementById("row-" + currentSongIndex);
+                        currentRow.classList.add("highlightedRow");
+                    }
+                }
+           });
+        }
+
+        $(document).ready(function () {
+            $(".video-slider").slick({
+                dots: false,
+                infinite: true,
+                slidesToShow: 4,
+                slidesToScroll: 1
+            });
+
+            $("#songsOfPlaylistTable").DataTable({
+                dom: 'flrtip',
+                language: {
+                    paginate: {
+                        previous: '<button type="button" class="btn btn-dark">Previous</button>',
+                        next: '<button type="button" class="btn btn-dark">Next</button>'
+                    }
+                }
+            });
+        });
+
+    </script>
+}

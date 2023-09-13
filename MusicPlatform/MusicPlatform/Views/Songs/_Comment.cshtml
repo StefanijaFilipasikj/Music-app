@@ -1,0 +1,42 @@
+﻿@model MusicPlatform.Models.Comment
+
+<li class="comment" id="comment-@Model.Id" style="min-height: 50px;">
+    <img src="@Model.PhotoURL" style="width: 40px; height: 40px; border-radius: 50%;" />
+    <span style="vertical-align: top; display: inline-block; height: 45px;">
+        <b>@Model.Email</b>
+        <span>@Model.Content </span>
+    </span>
+
+    <span class="actions">
+        @if (User.IsInRole("Listener"))
+        {
+            <button style="font-size: 14px; height: 35px;" class="btn btn-dark reply-btn">Reply</button>
+        }
+        @if (Model.Replies.Count > 0)
+        {
+            <button style="display: block; padding: 0; margin-top: -23px; margin-left: 45px; text-decoration: none; font-size: 14px;" class="btn btn-link show-replies-btn">&#11182; Show Replies</button>
+        }
+    </span>
+
+    <div class="reply-form" style="padding-left:40px; display: none;">
+        @if (User.IsInRole("Listener"))
+        {
+            <form id="replyForm-@Model.Id" action="@Url.Action("AddReply", "Songs")" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="songId" value="@Model.Song_Id" />
+                <input type="hidden" name="parentId" value="@Model.Id" />
+                <textarea class="btn btn-outline-dark" style="color: white; text-align: left; margin-bottom: 8px;" name="content" rows="1" cols="100"></textarea>
+                <button style="font-size: 14px" class="btn btn-primary reply-submit-btn" type="button" data-comment-id="@Model.Id">Reply</button>
+            </form>
+        }
+    </div>
+
+    <div class="replies" style="display: none;">
+        <ul style="list-style-type: none;">
+            @foreach (var reply in Model.Replies)
+            {
+                @Html.Partial("_Comment", reply) <!-- Recursive call to handle nested replies -->
+            }
+        </ul>
+    </div>
+</li>

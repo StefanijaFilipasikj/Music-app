@@ -1,0 +1,274 @@
+﻿@model MusicPlatform.Models.Song
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<div>
+    <h4>Song Details</h4>
+    <hr />
+
+    <div data-song-id="@Model.Id" data-video="@ViewBag.AudioId" data-autoplay="0" data-loop="1" id="youtube-audio" class="btn btn-outline-dark" style="width: 100%; color: white; font-size: 40px; border-radius: 0; padding: 20px">
+        @Html.DisplayFor(model => model.Title) &#119189;
+    </div>
+
+    <dl style="display: inline-block; width: 50%;">
+        <dt><br /></dt>
+        <dd>
+            @if (!string.IsNullOrEmpty(ViewBag.VideoTitle) && !string.IsNullOrEmpty(ViewBag.ThumbnailUrl))
+            {
+                <div onclick="updateViews()" style="width:560px;">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/@ViewBag.VideoId" frameborder="0" allowfullscreen"></iframe>
+                </div>
+            }
+            else
+            {
+                <p>No video available for this song.</p>
+            }
+        </dd>
+
+        <div style="display: inline-block; width: 220px;">
+            <dt>
+                Album
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Album.Title)
+            </dd>
+        </div>
+        <div style="display: inline-block; width: 220px;">
+            <dt>
+                Artist
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Artist.Name)
+            </dd>
+        </div>
+        <div style="display: inline-block; width: 110px;">
+            <dt>
+                @Html.DisplayNameFor(model => model.Likes)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Likes)
+            </dd>
+        </div>
+
+
+        <br />
+        <br />
+        <br />
+        <br />
+
+        <dt>
+            <p style="margin-bottom: 10px;">Comments</p>
+        </dt>
+        <dd>
+
+            @if (Model.Comments.Count == 0)
+            {
+                <p>There are no comments on this post</p>
+            }
+            else
+            {
+                <ul style="list-style-type: none; padding: 0;" id="comments-list">
+                    @foreach (var comment in Model.Comments.Where(c => c.ParentCommentId == null))
+                    {
+                        @Html.Partial("_Comment", comment)
+                    }
+                </ul>
+            }
+
+            <br />
+
+            @if (User.IsInRole("Listener"))
+            {
+                <form action="@Url.Action("AddComment", "Songs")" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="songId" value="@Model.Id" />
+                    <textarea class="btn btn-outline-dark" style="color: white; text-align: left; margin-bottom: 8px;" name="content" rows="1" cols="50"></textarea><br />
+                    <button class="btn btn-primary" type="submit">Add Comment</button>
+                </form>
+            }
+        </dd>
+
+        <br />
+        <br />
+        <br />
+        <br />
+
+
+        <div style="display: inline-block; width: 180px; text-align: center; margin-right: 30px;">
+            <dt>
+                <a href="/Albums/Details/@Model.Album.Id" style="text-decoration: none;">More About The Album</a>
+            </dt>
+            <dd>
+                <div class="imageRelativeContainer" style="width: 175px; height: 175px">
+                    <a href="/Albums/Details/@Model.Album.Id"><img src="@Model.Album.AlbumArtURL" style="height: 175px;" class="imageAbsolute" /></a>
+                </div>
+            </dd>
+        </div>
+
+        <div style="display: inline-block; width: 180px; text-align: center;">
+            <dt>
+                <a href="/Artists/Details/@Model.Artist.Id" style="text-decoration: none;">More About The Artist</a>
+            </dt>
+            <dd>
+                <div class="imageRelativeContainer" style="width: 175px; height: 175px">
+                    <a href="/Artists/Details/@Model.Artist.Id"><img src="@Model.Artist.PhotoUrl" style="height: 175px;" class="imageAbsolute"/></a>
+                </div>
+            </dd>
+        </div>
+    </dl>
+
+    <dl style="display: inline-block; vertical-align:top; width: 45%;">
+        <dt><br /></dt>
+        <dd>
+            <h3>Lyrics</h3>
+            <pre>@Model.Lyrics</pre>
+        </dd>
+    </dl>
+</div>
+
+<p>
+    @if (User.IsInRole("Artist"))
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) <br />
+    }
+</p>
+
+<br />
+
+@section scripts{
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        function onYouTubeIframeAPIReady() {
+            var e = document.getElementById("youtube-audio");
+            var a = document.createElement("div");
+            a.setAttribute("id", "youtube-player");
+            e.appendChild(a);
+            var o = function (e) { };
+            e.onclick = function () {
+                if (r.getPlayerState() === YT.PlayerState.PLAYING || r.getPlayerState() === YT.PlayerState.BUFFERING) {
+                    r.pauseVideo();
+                    o(false);
+                } else {
+                    r.playVideo();
+                    o(true);
+                }
+            };
+
+            
+
+            var r = new YT.Player("youtube-player", {
+                height: "0",
+                width: "0",
+                videoId: e.dataset.video,
+                playerVars: {
+                    autoplay: e.dataset.autoplay,
+                    loop: e.dataset.loop
+                },
+                events: {
+                    onReady: function (e) {
+                        $.ajax({
+                            url: "/Songs/IncrementPlays",
+                            method: "POST",
+                            data: { songId: @Model.Id },
+                            success: function () {
+                                console.log("success");
+                            },
+                            error: function (err) {
+                                console.log(err);
+                            }
+                        });
+
+                        r.setPlaybackQuality("small"),
+                            o(r.getPlayerState() !== YT.PlayerState.CUED)
+                    },
+                    onStateChange: function (e) {
+                        if (e.data === YT.PlayerState.ENDED) {
+                            o(false);
+                        }
+                    }
+                }
+            })
+        }
+
+    </script>
+
+
+    <script>
+        // Function to handle click event on reply buttons
+        function handleReplyButtonClick(event) {
+            var comment = this.closest(".comment");
+            var repliesDiv = comment.querySelector(".replies");
+            repliesDiv.style.display = "block";
+            var showRepliesButton = comment.querySelector(".show-replies-btn");
+            if (showRepliesButton) {
+                showRepliesButton.textContent = "\u2BAC Hide Replies";
+            }
+
+            // Toggle the reply form
+            var replyForm = comment.querySelector(".reply-form");
+            var hideRepliesButton = comment.querySelector(".hide-replies-btn");
+            if (replyForm.style.display === "none" || replyForm.style.display === "") {
+                replyForm.style.display = "block";
+                this.textContent = "Cancel";
+                hideRepliesButton.style.display = "inline"; // Show the "Hide Replies" button
+            } else {
+                replyForm.style.display = "none";
+                this.textContent = "Reply";
+            }
+        }
+
+        // Function to handle click event on "Show Replies" button
+        function handleShowRepliesButtonClick(event) {
+            var comment = this.closest(".comment");
+            var repliesDiv = comment.querySelector(".replies");
+            var replyForm = comment.querySelector(".reply-form");
+            if (repliesDiv.style.display === "none") {
+                repliesDiv.style.display = "block";
+                this.textContent = "\u2BAC Hide Replies";
+            } else {
+                repliesDiv.style.display = "none";
+                this.textContent = "\u2BAE Show Replies";
+            }
+        }
+
+        var replyButtons = document.querySelectorAll(".reply-btn");
+        for (var i = 0; i < replyButtons.length; i++) {
+            replyButtons[i].addEventListener("click", handleReplyButtonClick);
+        }
+
+        var showRepliesButtons = document.querySelectorAll(".show-replies-btn");
+        for (var j = 0; j < showRepliesButtons.length; j++) {
+            showRepliesButtons[j].addEventListener("click", handleShowRepliesButtonClick);
+        }
+
+        // Function to handle click event on "Add Reply" button
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("reply-submit-btn")) {
+                var commentId = event.target.dataset.commentId;
+                var form = document.getElementById("replyForm-" + commentId);
+
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action, true);
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        var newReply = xhr.responseText;
+                        var repliesList = form.closest(".comment").querySelector(".replies ul");
+                        repliesList.insertAdjacentHTML("beforeend", newReply);
+                        form.querySelector("textarea").value = "";
+                    } else {
+                        console.error("Error: " + xhr.status);
+                    }
+                };
+                xhr.send(formData);
+            }
+        });
+    </script>
+
+}

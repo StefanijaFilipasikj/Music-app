@@ -1,0 +1,95 @@
+﻿@model IEnumerable<MusicPlatform.Models.Artist>
+
+@{
+    ViewBag.Title = "Index";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <style>
+        th, td {
+            vertical-align: middle;
+        }
+        .btn-fu{
+            width: 90px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>All Artists</h2>
+
+    <table id="artistsTable" class="table">
+        <thead>
+            <tr>
+                <th>
+                    Profile picture
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="imageRelativeContainer" style="width: 70px; height: 70px;">
+                            <a href="/Artists/Details/@item.Id"><img class="imageAbsolute" src="@item.PhotoUrl" style="height:70px;" /></a>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="/Artists/Details/@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+                    </td>
+
+                    <td>
+                        @if (User.IsInRole("Listener") && item.Followers.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                        {
+                            using (Html.BeginForm("Unfollow", "Artists", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-fu">Unfollow</button>
+                            }
+                        }
+                        else
+                        {
+                            using (Html.BeginForm("Follow", "Artists", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-primary btn-fu">Follow</button>
+                            }
+                        }
+                    </td>
+                    <td>
+                        <a href="/Artists/Details/@item.Id" class="btn btn-dark">View Page</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <br /><br />
+</body>
+</html>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            table = $("#artistsTable").DataTable({
+                dom: 'flrtip',
+                language: {
+                    paginate: {
+                        previous: '<button type="button" class="btn btn-dark">Previous</button>',
+                        next: '<button type="button" class="btn btn-dark">Next</button>'
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,256 @@
+﻿@model MusicPlatform.Models.BestOfViewModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css" />
+    <style>
+        .coverContainer img {
+            height: 200px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .coverContainer {
+            position: relative;
+            width: 200px;
+            max-width: 200px;
+            height: 200px;
+            overflow-x: hidden;
+            margin: 30px;
+        }
+        .coverContainer:hover img {
+            filter: brightness(50%);
+        }
+        .coverContainer:hover .hoverText {
+            display: block;
+        }
+        .hoverText {
+            display: none;
+            width: 200px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 30px;
+            line-height: 34px;
+        }
+        .slick-prev,
+        .slick-next {
+            color: white;
+            background-color: transparent;
+            border: none;
+            font-size: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .slick-prev {
+            left: -10px;
+        }
+        .slick-next {
+            right: -10px;
+        }
+        .slick-prev::before {
+            content: "<";
+            color: white;
+            font-size: 25px;
+        }
+        .slick-next::before {
+            content: ">";
+            color: white;
+            font-size: 25px;
+        }
+        .video-slider{
+            padding: 0 20px;
+        }
+        h3{
+            margin-top: 30px;
+        }
+        .trending {
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+            height: 400px;
+            width: 100%;
+            text-align: center;
+            background-image: url( @Model.Trending.Album.AlbumArtURL );
+            background-size: 110%;
+            background-position: -10px -10px;
+            backdrop-filter: blur(50px) opacity(50%);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <a href="/Songs/Details/@Model.Trending.Id" class="trending btn btn-outline-dark">
+            
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            
+            <img src="@Model.Trending.Album.AlbumArtURL" style="height:100%; margin-right: 100px;" />
+            <div style="display: inline-block; vertical-align: middle;">
+                <h1>Trending</h1>
+                <h1 style="font-size: 48px;">@Model.Trending.Title</h1>
+                <h2>from @Model.Trending.Album.Title</h2>
+                <h2>by @Model.Trending.Artist.Name</h2>
+            </div>
+        </a>
+        <hr />
+        <div style="text-align: center;">
+            <div>
+                <h3>Top Artists</h3>
+                <ul class="video-slider">
+                    @foreach (var artist in Model.TopArtists)
+                    {
+                        <li class="coverContainer">
+                            <a href="Artists/Details/@artist.Id">
+                                <img src="@artist.PhotoUrl" />
+                                <p class="hoverText">@artist.Name</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>Top Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.TopSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>Top Albums</h3>
+                <ul class="video-slider">
+                    @foreach (var album in Model.TopAlbums)
+                    {
+                        <li class="coverContainer">
+                            <a href="Albums/Details/@album.Id">
+                                <img src="@album.AlbumArtURL" />
+                                <p class="hoverText">@album.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>Pop Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.PopSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>Rap Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.RapSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>R&B Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.RBSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>Rock Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.RockSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr />
+            <div>
+                <h3>K-pop Songs</h3>
+                <ul class="video-slider">
+                    @foreach (var song in Model.KPopSongs)
+                    {
+                        <li class="coverContainer">
+                            <a href="Songs/Details/@song.Id">
+                                <img src="@song.Album.AlbumArtURL" />
+                                <p class="hoverText">@song.Title</p>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <hr /><br />
+        </div>
+    </main>
+</body>
+</html>
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+        (function ($) {
+            $(document).ready(function () {
+                // Initialize Slick Carousel
+                $(".video-slider").slick({
+                    dots: false,
+                    infinite: true,
+                    slidesToShow: 5,
+                    slidesToScroll: 1
+                });
+            });
+
+            // Add JavaScript/jQuery for confetti animation here
+            $(".trending").hover(function () {
+                // Create and append confetti pieces on hover
+                for (let i = 0; i < 20; i++) {
+                    const confettiPiece = $("<div>").addClass("confetti-piece");
+                    $(".trending").append(confettiPiece);
+                }
+            }, function () {
+                // Remove confetti pieces on hover out
+                $(".confetti-piece").remove();
+            });
+        })(jQuery);
+    </script>
+}

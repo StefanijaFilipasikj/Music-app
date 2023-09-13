@@ -1,0 +1,147 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+body{
+    background-color: #131313;
+    color: white;
+}
+.navbar{
+    background-color: black;
+}
+a {
+    text-decoration: none;
+    color: white;
+}
+a:hover {
+    color: white;
+}
+.paginate_button a {
+    color: white;
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+}
+
+.paginate_button {
+    padding: 6px;
+    height: 37px;
+}
+
+button.bootbox-close-button.close {
+    border: none;
+}
+
+.bootbox-close-button {
+    display: none;
+}
+.modal-content {
+    background-color: black;
+}
+.btn-no-style {
+    background-color: inherit;
+    color: inherit;
+    border: none;
+}
+
+th.sorting, th.sorting_asc, th.sorting_desc {
+    color: white;
+    border-bottom: 1px solid #272727;
+}
+
+select.form-control.input-sm, select.form-control.input-sm > option, input.form-control.input-sm, select, input{
+    background-color: #131313;
+    color: inherit;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+table.table.dataTable{
+    border: none;
+}
+.td_title, .td_artist, .td_album{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: white;
+    border-color: #212529;
+}
+
+.td_title {
+    width: 270px;
+    max-width: 270px;
+}
+
+.td_artist {
+    width: 150px;
+    max-width: 150px;
+}
+
+.td_album {
+    width: 200px;
+    max-width: 200px;
+}
+
+.td_albumart {
+    width: 140px;
+}
+.imageRelativeContainer {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+.imageAbsolute {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+}
+.confetti-piece {
+    width: 17px;
+    height: 6px;
+    position: absolute;
+    background-color: white;
+    animation: confetti 1s ease-in-out infinite;
+    transform-origin: top left;
+}
+.confetti-piece:hover {
+    animation-play-state: paused;
+}
+.confetti-piece:nth-child(1) {
+    left: 10%;
+    top: 10%;
+}
+.confetti-piece:nth-child(2) {
+    left: 20%;
+    top: 15%;
+}
+@keyframes confetti {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(300px) rotate(360deg);
+        opacity: 0;
+    }
+}

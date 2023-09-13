@@ -1,0 +1,238 @@
+﻿@model MusicPlatform.Models.Artist
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 150px;
+            height: 13px;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border: 1px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+
+        }
+        .albumCoverContainer {
+            position: relative;
+        }
+        .albumCoverContainer:hover img{
+            filter: brightness(50%);
+        }
+        .albumCoverContainer:hover .albumTitle{
+            display: block;
+        }
+        .albumTitle {
+            display: none;
+            width: 270px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            line-height: 46px;
+            text-shadow: none;
+        }
+        .photo-editor {
+            width: 100%;
+            height: 430px;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-editor img {
+            width: 100%;
+            transform-origin: center center;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+        .coverContainer{
+            position: relative;
+        }
+        .artistName, .artistFollowers {
+            position: absolute;
+            left: 10px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+        .artistName {
+            top: 30%;
+        }
+        .artistFollowers {
+            top: 55%;
+        }
+
+    </style>
+</head>
+<body>
+
+    @if (User.IsInRole("Artist"))
+    {
+        <h4>My Profile</h4>
+    }
+    else
+    {
+        <h4>Artist Details</h4>
+    }
+
+
+    <div>
+        <hr />
+        <div class="coverContainer">
+            <div class="photo-editor">
+                <img id="user-photo" src="@Model.PhotoUrl" alt="User Photo">
+            </div>
+            @if (Model.Email.Equals(User.Identity.Name))
+            {
+                <div class="controls">
+                    <input type="range" id="zoom-range" min="1" max="3" step="0.1" value="1" style="position: absolute; bottom: 5%; left: 10px;">
+                </div>
+            }
+            <h1 class="artistName" style="text-align: center; font-size: 90px;">@Model.Name</h1>
+            <p class="artistFollowers" style="text-align: center; font-size:30px;">
+                @Model.Followers.Count
+                @if (Model.Followers.Count == 1)
+                {
+                    <span>follower</span>
+                }
+                else
+                {
+                    <span>followers</span>
+                }
+            </p>
+        </div>
+
+        <hr /><br /><br />
+
+        <div style="text-align: center">
+            <h1>Discography</h1>
+            <br /><br />
+            <div>
+                <ul style="margin: 0 40px;">
+                    @foreach (var album in Model.Albums)
+                    {
+                        <li class="albumCoverContainer" style="display: inline-block; margin:20px;">
+                            <a href="@Url.Action("Details", "Albums", new { id = album.Id })">
+                                <img src="@album.AlbumArtURL" width="270" height="270" />
+                                <div class="albumTitle">@album.Title</div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <br /><br /><br />
+
+    </div>
+
+    <p>
+        @if (User.IsInRole("Artist"))
+        {
+            <div style="text-align: center;">
+                <a href="/Albums/Create/@Model.Id" class="btn btn-dark" style="color: white; text-decoration: none;">Add a new album</a>
+            </div>
+        }
+    </p>
+    <br />
+
+
+</body>
+</html>
+
+@section scripts{
+    <script>
+        const photoEditor = document.querySelector('.photo-editor');
+const userPhoto = document.getElementById('user-photo');
+const zoomRange = document.getElementById('zoom-range');
+
+let currentScale = 1;
+let currentX = 0;
+let currentY = 0;
+let storageKey = ""; // Unique storage key for each artist
+
+// Function to load the image state from localStorage
+function loadImageState() {
+  const savedState = localStorage.getItem(storageKey);
+  if (savedState) {
+    const { scale, translateX, translateY } = JSON.parse(savedState);
+    currentScale = scale;
+    currentX = translateX;
+    currentY = translateY;
+    updateImageTransform();
+  }
+}
+
+// Function to save the current image state to localStorage
+function saveImageState() {
+  localStorage.setItem(storageKey, JSON.stringify({
+    scale: currentScale,
+    translateX: currentX,
+    translateY: currentY
+  }));
+}
+
+// Load the image state when the page is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Set the unique storage key based on the artist's identity
+  storageKey = "imageState_" + "@Model.Email"; // You can use a unique identifier like email or ID
+  loadImageState();
+});
+
+zoomRange.addEventListener('input', () => {
+  currentScale = parseFloat(zoomRange.value);
+  updateImageTransform();
+  saveImageState(); // Save the image state when zoom changes
+});
+
+function updateImageTransform() {
+  userPhoto.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
+}
+
+// Enable dragging the image
+let isDragging = false;
+let startMouseX, startMouseY, startElementX, startElementY;
+
+userPhoto.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  startMouseX = e.clientX;
+  startMouseY = e.clientY;
+  startElementX = currentX;
+  startElementY = currentY;
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const deltaX = e.clientX - startMouseX;
+  const deltaY = e.clientY - startMouseY;
+  currentX = startElementX + deltaX;
+  currentY = startElementY + deltaY;
+  updateImageTransform();
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+});
+
+document.addEventListener('mouseleave', () => {
+  isDragging = false;
+});
+
+// Add an event listener to save the image state when the user navigates away from the page
+window.addEventListener('beforeunload', () => {
+  saveImageState();
+});       
+    </script>        
+}

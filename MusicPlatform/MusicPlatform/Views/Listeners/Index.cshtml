@@ -1,0 +1,76 @@
+﻿@model IEnumerable<MusicPlatform.Models.Listener>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <style>
+        th, td {
+            vertical-align: middle;
+            color: white;
+            border-color: #272727;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Listeners</h2>
+
+    <table id="listenersTable" class="table">
+        <thead>
+            <tr>
+                <th>
+                    Profile Photo
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.PhotoUrl" style="width:70px; height: 70px;" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        <a href="/Listeners/Details/@item.Id" class="btn btn-dark">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            table = $("#listenersTable").DataTable({
+                dom: 'flrtip',
+                language: {
+                    paginate: {
+                        previous: '<button type="button" class="btn btn-dark">Previous</button>',
+                        next: '<button type="button" class="btn btn-dark">Next</button>'
+                    }
+                }
+            });
+        });
+    </script>
+}

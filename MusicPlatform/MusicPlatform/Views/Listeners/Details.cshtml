@@ -1,0 +1,59 @@
+﻿@model MusicPlatform.Models.Listener
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Listener Details</h2>
+
+<div>
+    <hr />
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            Profile Photo
+        </dt>
+
+        <dd>
+            <img src="@Model.PhotoUrl" style="width: 100px;"/>
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            Following
+        </dt>
+        <dd>
+            @if (Model.Following.Count == 0)
+            {
+                <p>Not following anyone yet</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var artist in Model.Following)
+                    {
+                        <li>
+                            <a href="/Artists/Details/@artist.Id">@artist.Name</a>
+                        </li>
+                    }
+                </ul>
+            }
+
+        </dd>
+    </dl>
+</div>

@@ -1,0 +1,432 @@
+﻿@model IEnumerable<MusicPlatform.Models.Song>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+
+    <style>
+        th, td {
+            vertical-align: middle;
+        }
+    </style>
+
+</head>
+<body>
+
+    @if (User.IsInRole("Artist"))
+    {
+        <h2>My Songs</h2>
+    }
+    else
+    {
+        <h2>All Songs</h2>
+    }
+
+    <table id="songsTable" class="table">
+        <thead>
+            <tr>
+                <th>
+                    Album Art
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    Album
+                </th>
+                @if (User.IsInRole("Artist"))
+                {
+                    <th>
+                        @Html.DisplayNameFor(model => model.Likes)
+                    </th>
+                }
+
+                @if (User.IsInRole("Listener"))
+                {
+                    <th>Artist</th>
+                    <th>Audio</th>
+                    <th>Video</th>
+                    <th>Like</th>
+                    <th>See More</th>
+                }
+                else
+                {
+                    <th></th>
+                }
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a href="/Albums/Details/@item.Album.Id"><img src="@item.Album.AlbumArtURL" style="width: 70px;" /></a>
+                    </td>
+                    <td>
+                        <a href="/Songs/Details/@item.Id">@Html.DisplayFor(modelItem => item.Title)</a>
+                    </td>
+                    <td>
+                        <a href="/Albums/Details/@item.Album.Id">@Html.DisplayFor(modelItem => item.Album.Title)</a>
+
+                    </td>
+                    @if (User.IsInRole("Artist"))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Likes)
+                        </td>
+                    }
+                    @if (User.IsInRole("Listener"))
+                    {
+                        <td>
+                            <a href="/Artists/Details/@item.Artist.Id">@Html.DisplayFor(modelItem => item.Artist.Name)</a>
+                        </td>
+                        <td>
+                            <button class="btn btn-dark audio-play-btn" data-audio-url="@item.AudioURL" data-album-art="@item.Album.AlbumArtURL" 
+                                    data-song-title="@item.Title" data-album-title="@item.Album.Title" data-artist-name="@item.Artist.Name" data-song-id="@item.Id">
+                                
+                                <i class="fas fa-play"></i> &#x25B7;
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-dark video-play-btn" data-video-url="@item.VideoURL" data-song-id="@item.Id">
+                                <i class="fas fa-play"></i> &#x25B7;
+                            </button>
+                        </td>
+                        <td>
+                            @if (User.IsInRole("Listener") && item.LikesFromListeners.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                            {
+                                using (Html.BeginForm("Unlike", "Songs", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9829;</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Like", "Songs", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9825;</button>
+                                }
+                            }
+                        </td>
+                    }
+
+                <td>
+                    @if (User.IsInRole("Artist"))
+                    {
+                        <a href="/Songs/Edit/@item.Id" class="btn btn-dark">Edit</a>
+                    }
+                    @if (User.IsInRole("Artist"))
+                    {
+                        <a href="/Songs/Delete/@item.Id" data-song-id="@item.Id" class="btn btn-dark js-delete">Delete</a>
+                    }
+                    @if (User.IsInRole("Artist"))
+                    {
+                        <a href="/Songs/Details/@item.Id" class="btn btn-dark">Details</a>
+                    }
+                    else
+                    {
+                        <a href="/Songs/Details/@item.Id" class="btn btn-dark">Details</a>
+                    }
+
+                    <p style="display: none;">@item.Genre</p>
+                    <p style="display: none;">@item.Language</p>
+                </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="min-width: 646px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoModalLabel">Video Player</h5>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">&#10005;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe width="612" height="345" class="embed-responsive-item" id="videoPlayer" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="audioModal" tabindex="-1" role="dialog" aria-labelledby="audioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="width: 370px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="audioModalLabel">Audio Player</h5>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">&#10005;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <img class="img-fluid" id="albumArt" width="250" height="250" />
+
+
+                    <p id="modalAudioTitle" style="padding: 0; margin: 10px 0 0 0;"></p>
+
+                    <div style="padding: 0; margin: 0;">
+                        <span id="modalAudioArtist"></span> - <span id="modalAudioTitle2"></span> - <span id="modalAudioAlbum"></span>
+                    </div>
+
+                    <div style="padding: 0; margin: 0;">
+                        <div data-autoplay="0" data-loop="1" id="youtube-audio">
+                            <button id="playPauseButton" style="font-size: 25px;" class="btn-no-style" onclick="togglePlayPause()">&#11208;</button>
+                            <div id="youtube-player"></div>
+                        </div>
+                    </div>
+
+                    <span id="currentTime" style="font-size: 13px;"></span>
+                    <progress id="progressbar" value="0" max="100" style="width:240px;"></progress>
+                    <span id="totalTime" style="font-size: 13px;"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <br /><br />
+</body>
+</html>
+
+@section scripts{
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+
+        $(document).ready(function () {
+            table = $("#songsTable").DataTable({
+                dom: 'flrtip',
+                language: {
+                    paginate: {
+                        previous: '<button type="button" class="btn btn-dark">Previous</button>',
+                        next: '<button type="button" class="btn btn-dark">Next</button>'
+                    }
+                }
+            });
+
+            $("#songsTable .js-delete").on("click", function () {
+                var button = $(this);
+                bootbox.confirm({
+                    message: "Are you sure you want to delete this song?",
+                    buttons: {
+                        confirm: {
+                            label: 'Delete',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'Cancel',
+                            className: 'btn-secondary'
+                        }
+                    },
+                    closeButton: false,
+                    callback: function (result) {
+                        if (result) {
+                            $.ajax({
+                                url: "Songs/Delete/" + button.attr("data-song-id"),
+                                method: "POST",
+                                success: function () {
+                                    table.row(button.parents("tr")).remove().draw();
+                                },
+                                error: function (err) {
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    }
+                });
+                return false;
+            });
+
+
+            // Handle the click event of the play button for video
+            $(".video-play-btn").on("click", function () {
+                var id = $(this).data("song-id");
+                var videoId = $(this).data("video-url");
+                $.ajax({
+                    url: "/Songs/IncrementPlays", // Replace with your actual route
+                    method: "POST",
+                    data: { songId: id }, // Pass the song ID to the server
+                    success: function () {
+                        var videoPlayer = $("#videoPlayer");
+                        videoPlayer.attr("src", "https://www.youtube.com/embed/" + videoId); // Set the video URL to the iframe src attribute
+                        $("#videoModal").modal("show"); // Show the video modal
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            // Clear the video URL when the video modal is closed
+            $("#videoModal").on("hidden.bs.modal", function () {
+                var videoPlayer = $("#videoPlayer");
+                videoPlayer.attr("src", "");
+            });
+
+            // Close the modal when clicking outside (the backdrop) or pressing the Esc key
+            $("#videoModal").on("click", function (event) {
+                if ($(event.target).hasClass("modal") || event.key === "Escape") {
+                    $("#videoModal").modal("hide");
+                }
+            });
+
+            // Close the modal when clicking the close button
+            $(".modal-header .btn-danger").on("click", function () {
+                $("#videoModal").modal("hide");
+            });
+
+
+            //AUDIO
+            // Handle the click event of the play button for audio
+
+            var r; //Youtube Player
+
+            $(".audio-play-btn").on("click", function () {
+
+                var audioUrl = $(this).data("audio-url");
+                var albumArt = $(this).data("album-art");
+                var album = $(this).data("album-title");
+                var song = $(this).data("song-title");
+                var artist = $(this).data("artist-name");
+                var progressInterval;
+
+                $("#albumArt").attr("src", albumArt);
+                $("#modalAudioTitle").text(song);
+                $("#modalAudioTitle2").text(song);
+                $("#modalAudioArtist").text(artist);
+                $("#modalAudioAlbum").text(album);
+
+                var id = $(this).data("song-id");
+                $.ajax({
+                    url: "/Songs/IncrementPlays", // Replace with your actual route
+                    method: "POST",
+                    data: { songId: id, }, // Pass the song ID to the server
+                    success: function () {
+                        $("#audioModal").modal("show"); // Show the audio modal
+
+                        onYouTubeIframeAPIReady();
+                        function onYouTubeIframeAPIReady() {
+                            var e = document.getElementById("youtube-audio");
+                            var t = document.getElementById("youtube-icon");
+                            var a = document.getElementById("youtube-player");
+                            var o = function (e) { t.textContent = "\u25B7" };
+                            e.onclick = function () {
+                                r.getPlayerState() === YT.PlayerState.PLAYING || r.getPlayerState() === YT.PlayerState.BUFFERING ? (r.pauseVideo(), o(!1)) : (r.playVideo(), o(!0))
+                            };
+                            if (r) {
+                                r.loadVideoById(audioUrl);
+                            } else {
+                                r = new YT.Player("youtube-player", {
+                                    height: "0",
+                                    width: "0",
+                                    videoId: audioUrl,
+                                    playerVars: {
+                                        autoplay: e.dataset.autoplay,
+                                        loop: e.dataset.loop
+                                    },
+                                    events: {
+                                        onReady: function (e) {
+
+                                            $("#progressbar").on("click", function (e) {
+                                                var progressBar = e.target;
+                                                var clickPosition = e.offsetX;
+                                                var progressBarWidth = progressBar.offsetWidth;
+                                                var seekPercentage = (clickPosition / progressBarWidth) * 100;
+
+                                                var duration = r.getDuration();
+                                                var seekTime = (duration * seekPercentage) / 100;
+
+                                                r.seekTo(seekTime);
+                                            });
+
+                                            e.target.playVideo();
+                                            updateProgressBar();
+                                        },
+                                        onStateChange: function (e) {
+                                            if (e.data === YT.PlayerState.PLAYING) {
+                                                $("#playPauseButton").html("&#10074;&#10074;");
+                                                progressInterval = setInterval(updateProgressBar, 1000);
+                                            } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+                                                $("#playPauseButton").html("&#11208;");
+                                                clearInterval(progressInterval);
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            function updateProgressBar() {
+                var currentTime = r.getCurrentTime();
+                var duration = r.getDuration();
+
+                var currentMinutes = (Math.floor(currentTime / 60)).toString().padStart(2, '0');
+                var currentSeconds = (Math.floor(currentTime % 60)).toString().padStart(2, '0');;
+
+                var totalMinutes = (Math.floor(duration / 60)).toString().padStart(2, '0');;
+                var totalSeconds = (Math.floor(duration % 60)).toString().padStart(2, '0');;
+
+                $("#currentTime").text(currentMinutes + ":" + currentSeconds);
+                $("#totalTime").text(totalMinutes + ":" + totalSeconds);
+
+                var progressPercentage = (currentTime / duration) * 100;
+                $("#progressbar").attr("value", progressPercentage);
+            }
+
+            // Clear the video URL when the audio modal is closed
+            $("#audioModal").on("hidden.bs.modal", function () {
+                stopYouTubePlayer();
+            });
+
+            // Close the modal when clicking outside (the backdrop) or pressing the Esc key
+            $("#audioModal").on("click", function (event) {
+                if ($(event.target).hasClass("modal") || event.key === "Escape") {
+                    $("#audioModal").modal("hide");
+                    stopYouTubePlayer();
+                }
+            });
+
+            // Close the modal when clicking the close button
+            $(".modal-header .btn-danger").on("click", function () {
+                $("#audioModal").modal("hide");
+                stopYouTubePlayer();
+            });
+
+            function stopYouTubePlayer() {
+                if (r && r.stopVideo) {
+                    r.stopVideo(); // Stop the YouTube player
+                }
+                clearInterval(progressInterval); // Clear the progress interval
+            }
+
+            // Function to toggle play/pause button
+            function togglePlayPause() {
+                if (r) {
+                    var playerState = r.getPlayerState();
+                    if (playerState === YT.PlayerState.PLAYING) {
+                        r.pauseVideo();
+                    } else if (playerState === YT.PlayerState.PAUSED || playerState === YT.PlayerState.ENDED) {
+                        r.playVideo();
+                    }
+                }
+            }
+        });
+    </script>
+}
+

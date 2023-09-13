@@ -1,0 +1,494 @@
+﻿@model IEnumerable<MusicPlatform.Models.Album>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        th, td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    @if (User.IsInRole("Artist"))
+    {
+        <h2>My Albums</h2>
+    }
+    else
+    {
+        <h2>All Albums</h2>
+
+    }
+
+    <table id="albumsTable" class="table">
+        <thead>
+            <tr>
+                <th>
+                    Album Art
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                @if (User.IsInRole("Listener"))
+                {
+                    <th>
+                        Artist
+                    </th>
+                    <th>
+                        Audio
+                    </th>
+                    <th>
+                        Video
+                    </th>
+                    <th>
+                        Like
+                    </th>
+                }
+                else
+                {
+                    <th>
+                        Likes
+                    </th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (item, index) in Model.Select((album, index) => (album, index)))
+            {
+                <tr>
+                    <td class="td_albumart">
+                        <a href="/Albums/Details/@item.Id"><img src="@item.AlbumArtURL" style="width: 70px;" /></a>
+                    </td>
+                    <td class="td_title">
+                        <a href="/Albums/Details/@item.Id">@Html.DisplayFor(modelItem => item.Title)</a>
+                    </td>
+                    @if (User.IsInRole("Listener"))
+                    {
+                        <td class="td_artist">
+                            <a href="/Artists/Details/@item.Artist.Id">@Html.DisplayFor(modelItem => item.Artist.Name)</a>
+                        </td>
+                        <td>
+                            <button class="btn btn-dark audio-play-btn"
+                                    data-audio-urls='@Html.Raw(Json.Encode(item.Songs.Select(song => song.AudioURL)))'
+                                    data-titles='@Html.Raw(Json.Encode(item.Songs.Select(song => song.Title)))'
+                                    data-album-art="@item.AlbumArtURL"
+                                    data-album-title="@item.Title"
+                                    data-artist-name="@item.Artist.Name">
+                                <i class="fas fa-play"></i> &#x25B7;
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-dark video-play-btn" data-video-urls='@Html.Raw(Json.Encode(item.Songs.Select(song => song.VideoURL)))'>
+                                <i class="fas fa-play"></i> &#x25B7;
+                            </button>
+                        </td>
+                        <td>
+                            @if (item.LikesFromListeners.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                            {
+                                using (Html.BeginForm("Unlike", "Albums", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9829;</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("Like", "Albums", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#9825;</button>
+                                };
+                            }
+                        </td>
+                        <td>
+                            <a href="/Albums/Details/@item.Id" class="btn btn-dark">Details</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <span style="color: white;">
+                                @Html.DisplayFor(modelItem => item.Likes)
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/Albums/Edit/@item.Id" class="btn btn-dark">Edit</a>
+                            <button data-album-id="@item.Id" class="btn btn-dark js-delete">Delete</button>
+                            <a href="/Albums/Details/@item.Id" class="btn btn-dark">Details</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (User.IsInRole("Artist"))
+    {
+        <div>
+            <a href="/Albums/Create/@ViewBag.ArtistId" class="btn btn-dark" style="color: white; text-decoration: none;">Add a new album</a>
+        </div>
+    }
+
+    <!-- Audio Modal -->
+    <div class="modal fade" id="audioModal" tabindex="-1" role="dialog" aria-labelledby="audioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="width: 370px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="audioModalLabel">Audio Player</h5>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">&#10005;</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <img class="img-fluid" id="albumArt" width="250" height="250" />
+
+
+                    <p id="modalAudioTitle" style="padding: 0; margin: 10px 0 0 0;"></p>
+
+                    <div style="padding: 0; margin: 0;">
+                        <span id="modalAudioArtist"></span> - <span id="modalAudioTitle2"></span> - <span id="modalAudioAlbum"></span>
+                    </div>
+
+                    <div style="padding: 0; margin: 0;">
+                        <div data-autoplay="0" data-loop="1" id="youtube-audio">
+                            <button id="previousButton" class="btn-no-style" style="font-size: 25px;" onclick="playPrevious()">&#11244;</button>
+                            <button id="playPauseButton" class="btn-no-style" style="font-size: 25px;" onclick="togglePlayPause()">&#11208;</button>
+                            <button id="nextButton" class="btn-no-style" style="font-size: 25px;" onclick="playNext()">&#11246;</button>
+                            <div id="audio-player"></div>
+                        </div>
+                    </div>
+
+                    <span id="currentTime" style="font-size: 13px;"></span>
+                    <progress id="progressbar" value="0" max="100" style="width:240px;"></progress>
+                    <span id="totalTime" style="font-size: 13px;"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="min-width: 646px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoModalLabel">Video Player</h5>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">&#10005;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <div id="video-player"></div>
+
+                        <button id="previousVideoButton" class="btn btn-dark" onclick="playPreviousVideo()">Previous</button>
+                        <button id="nextVideoButton" class="btn btn-dark" onclick="playNextVideo()">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br /><br />
+</body>
+</html>
+
+@section scripts{
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            table = $("#albumsTable").DataTable({
+                dom: 'flrtip',
+                language: {
+                    paginate: {
+                        previous: '<button type="button" class="btn btn-dark">Previous</button>',
+                        next: '<button type="button" class="btn btn-dark">Next</button>'
+                    }
+                }
+            });
+
+            $("#albumsTable .js-delete").on("click", function () {
+                var button = $(this);
+                bootbox.confirm({
+                    message: "Are you sure you want to delete this album?",
+                    buttons: {
+                        confirm: {
+                            label: 'Delete',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'Cancel',
+                            className: 'btn-secondary'
+                        }
+                    },
+                    closeButton: false,
+                    callback: function (result) {
+                        if (result) {
+                            $.ajax({
+                                url: "Albums/Delete/" + button.attr("data-album-id"),
+                                method: "POST",
+                                success: function () {
+                                    table.row(button.parents("tr")).remove().draw();
+                                },
+                                error: function (err) {
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+
+        var videoPlayer;
+        var videoIndex = 0;
+        var videoURLs = $(this).data("video-urls");;
+
+        function playPreviousVideo() {
+            videoIndex--;
+            if (videoIndex < 0) videoIndex = videoURLs.length - 1;
+            initializeYouTubePlayer(videoURLs[videoIndex]);
+        }
+        function playNextVideo() {
+            videoIndex++;
+            if (videoIndex >= videoURLs.length) videoIndex = 0;
+            initializeYouTubePlayer(videoURLs[videoIndex]);
+        }
+
+        // Handle the click event of the play button for video
+        $(".video-play-btn").on("click", function () {
+            videoURLs = $(this).data("video-urls");
+            videoIndex = 0;
+            initializeYouTubePlayer(videoURLs[videoIndex]);
+        });
+
+        // Function to initialize the YouTube video player
+        function initializeYouTubePlayer(videoURL) {
+            if (videoPlayer) {
+                videoPlayer.destroy(); // Destroy the existing player
+            }
+
+            videoPlayer = new YT.Player("video-player", {
+                height: "345", // Set the desired height
+                width: "612",  // Set the desired width
+                videoId: videoURL,
+                events: {
+                    onReady: function (event) {
+                        event.target.playVideo(); // Start playing the video
+                    },
+                    onStateChange: function (event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            videoIndex++;
+                            if (videoIndex < videoURLs.length) {
+                                initializeYouTubePlayer(videoURLs[videoIndex]);
+                            } else {
+                                // All videos have been played
+                                // You might want to handle this case here
+                                $("#videoModal").modal("hide"); // Close the modal when all videos are played
+                            }
+                        }
+                    }
+                }
+            });
+
+            $("#videoModal").modal("show"); // Show the video modal after initializing the player
+        }
+
+        // Clear the video URL when the video modal is closed
+        $("#videoModal").on("hidden.bs.modal", function () {
+            var videoPlayer = $("#videoPlayer");
+            videoPlayer.attr("src", "");
+        });
+
+        // Close the modal when clicking outside (the backdrop) or pressing the Esc key
+        $("#videoModal").on("click", function (event) {
+            if ($(event.target).hasClass("modal") || event.key === "Escape") {
+                $("#videoModal").modal("hide");
+                stopVideoPlayer();
+            }
+        });
+
+        // Close the modal when clicking the close button
+        $(".modal-header .btn-danger").on("click", function () {
+            $("#videoModal").modal("hide");
+            stopVideoPlayer();
+        });
+
+
+        function stopVideoPlayer() {
+            if (videoPlayer && videoPlayer.stopVideo) {
+                videoPlayer.stopVideo(); // Stop the YouTube player
+            }
+        }
+
+
+
+        // Handle the click event of the play button for audio
+
+        var audioPlayer;
+        var audioIndex = 0;
+        var audioURLs;
+        var titles;
+        var albumArt;
+        var albumName;
+        var artistName;
+        var progressInterval;
+
+        // Handle the click event of the play button for audio
+        $(".audio-play-btn").on("click", function () {
+            audioURLs = $(this).data("audio-urls");
+            titles = $(this).data("titles");
+            audioIndex = 0;
+
+            albumArt = $(this).data("album-art");
+            albumName = $(this).data("album-title");
+            artistName = $(this).data("artist-name");
+
+            initializeAudioPlayer(audioURLs[audioIndex]);
+        });
+
+        // Function to initialize the YouTube video player
+        function initializeAudioPlayer(audioURL) {
+            var e = document.getElementById("youtube-audio");
+            var t = document.getElementById("youtube-icon");
+            var a = document.getElementById("youtube-player");
+            var o = function (e) { t.textContent = "\u25B7" };
+
+            e.onclick = function () {
+                audioPlayer.getPlayerState() === YT.PlayerState.PLAYING || audioPlayer.getPlayerState() === YT.PlayerState.BUFFERING ? (audioPlayer.pauseVideo(), o(!1)) : (audioPlayer.playVideo(), o(!0))
+            };
+
+            if (audioPlayer) {
+                audioPlayer.destroy(); // Destroy the existing player
+            }
+
+            audioPlayer = new YT.Player("audio-player", {
+                height: "0", 
+                width: "0",  
+                videoId: audioURL,
+                playerVars: {
+                    autoplay: e.dataset.autoplay,
+                    loop: e.dataset.loop
+                },
+                events: {
+                    onReady: function (event) {
+                        $("#albumArt").attr("src", albumArt);
+                        $("#modalAudioTitle").text(titles[audioIndex]);
+                        $("#modalAudioTitle2").text(titles[audioIndex]);
+                        $("#modalAudioArtist").text(artistName);
+                        $("#modalAudioAlbum").text(albumName);
+
+                        $("#progressbar").on("click", function (event) {
+                            var progressBar = event.target;
+                            var clickPosition = event.offsetX;
+                            var progressBarWidth = progressBar.offsetWidth;
+                            var seekPercentage = (clickPosition / progressBarWidth) * 100;
+
+                            var duration = audioPlayer.getDuration();
+                            var seekTime = (duration * seekPercentage) / 100;
+
+                            audioPlayer.seekTo(seekTime);
+                        });
+
+                        event.target.playVideo(); 
+                        updateProgressBar();
+                    },
+                    onStateChange: function (event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            $("#playPauseButton").html("&#10074;&#10074;");
+                            progressInterval = setInterval(updateProgressBar, 1000);
+                        } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                            $("#playPauseButton").html("&#11208;");
+                            clearInterval(progressInterval);
+                        }
+
+
+                        if (event.data === YT.PlayerState.ENDED) {
+                            audioIndex++;
+                            if (audioIndex < audioURLs.length) {
+                                initializeAudioPlayer(audioURLs[audioIndex]);
+                            } else {
+                                $("#audioModal").modal("hide");
+                            }
+                        }
+                    }
+                }
+            });
+
+            $("#audioModal").modal("show"); // Show the audio modal after initializing the player
+        }
+
+        function updateProgressBar() {
+            var currentTime = audioPlayer.getCurrentTime();
+            var duration = audioPlayer.getDuration();
+
+            var currentMinutes = (Math.floor(currentTime / 60)).toString().padStart(2, '0');
+            var currentSeconds = (Math.floor(currentTime % 60)).toString().padStart(2, '0');;
+
+            var totalMinutes = (Math.floor(duration / 60)).toString().padStart(2, '0');;
+            var totalSeconds = (Math.floor(duration % 60)).toString().padStart(2, '0');;
+
+            $("#currentTime").text(currentMinutes + ":" + currentSeconds);
+            $("#totalTime").text(totalMinutes + ":" + totalSeconds);
+
+            var progressPercentage = (currentTime / duration) * 100;
+            $("#progressbar").attr("value", progressPercentage);
+        }
+
+        // Clear the audio URL when the audio modal is closed
+        $("#audioModal").on("hidden.bs.modal", function () {
+            var audioPlayer = $("#audioPlayer");
+            audioPlayer.attr("src", "");
+        });
+
+        // Close the modal when clicking outside (the backdrop) or pressing the Esc key
+        $("#audioModal").on("click", function (event) {
+            if ($(event.target).hasClass("modal") || event.key === "Escape") {
+                $("#audioModal").modal("hide");
+                stopAudioPlayer();
+            }
+        });
+
+        // Close the modal when clicking the close button
+        $(".modal-header .btn-danger").on("click", function () {
+            $("#audioModal").modal("hide");
+            stopAudioPlayer();
+        });
+
+        function stopAudioPlayer() {
+            if (audioPlayer && audioPlayer.stopVideo) {
+                audioPlayer.stopVideo(); // Stop the YouTube player
+            }
+            clearInterval(progressInterval); // Clear the progress interval
+        }
+
+        // Function to toggle play/pause button
+        function togglePlayPause() {
+            if (audioPlayer) {
+                var playerState = audioPlayer.getPlayerState();
+                if (playerState === YT.PlayerState.PLAYING) {
+                    audioPlayer.pauseVideo();
+                } else if (playerState === YT.PlayerState.PAUSED || playerState === YT.PlayerState.ENDED) {
+                    audioPlayer.playVideo();
+                }
+            }
+        }
+
+        function playPrevious() {
+            audioIndex--;
+            if (audioIndex < 0) audioIndex = audioURLs.length-1;
+            initializeAudioPlayer(audioURLs[audioIndex]);
+        }
+
+        function playNext() {
+            audioIndex++;
+            if (audioIndex >= audioURLs.length) audioIndex = 0;
+            initializeAudioPlayer(audioURLs[audioIndex]);
+        }
+
+    </script>
+}

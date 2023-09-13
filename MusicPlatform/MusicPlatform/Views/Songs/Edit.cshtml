@@ -1,0 +1,144 @@
+﻿@model MusicPlatform.Models.Song
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Edit this song</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.VideoURL, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.VideoURL, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
+            @Html.ValidationMessageFor(model => model.VideoURL, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AudioURL, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AudioURL, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
+            @Html.ValidationMessageFor(model => model.AudioURL, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Lyrics, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Lyrics, new { @class = "form-control btn btn-dark", rows = 10 })
+            @Html.ValidationMessageFor(model => model.Lyrics, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Language, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.Language, (SelectList)ViewBag.Languages, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
+            @Html.ValidationMessageFor(model => model.Language, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Genre, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.Genre, (SelectList)ViewBag.Genres, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
+            @Html.ValidationMessageFor(model => model.Genre, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.HiddenFor(model => model.ArtistId)
+            @Html.ValidationMessageFor(model => model.ArtistId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.HiddenFor(model => model.AlbumId)
+            @Html.ValidationMessageFor(model => model.AlbumId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.HiddenFor(model => model.Likes)
+            @Html.ValidationMessageFor(model => model.Likes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <br />
+            <input type="submit" value="Save" class="btn btn-dark" id="submit-button" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    <br />
+    <a class="btn btn-dark" href="@Request.Headers["Referer"]">Back</a>
+</div>
+
+<br /><br />
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            var selectedGenres = [];
+            var selectedLanguages = [];
+
+            $("#addGenreButton").click(function () {
+                var selectedGenre = $("#genreDropdown option:selected").text();
+                if (!selectedGenres.includes(selectedGenre)) {
+                    selectedGenres.push(selectedGenre);
+                    updateSelectedGenresDisplay();
+                }
+            });
+
+            $("#addLanguageButton").click(function () {
+                var selectedLanguage = $("#languageDropdown option:selected").text();
+                if (!selectedLanguages.includes(selectedLanguage)) {
+                    selectedLanguages.push(selectedLanguage);
+                    updateSelectedLanguagesDisplay();
+                }
+            });
+
+            function updateSelectedGenresDisplay() {
+                $("#selectedGenres").empty();
+                $("#selectedGenres").append("Selected genres: ");
+                selectedGenres.forEach(function (genre) {
+                    $("#selectedGenres").append("<span>" + genre + "</span>" + ", ");
+                });
+            }
+
+            function updateSelectedLanguagesDisplay() {
+                $("#selectedLanguages").empty();
+                $("#selectedLanguages").append("Selected languages: ");
+                selectedLanguages.forEach(function (language) {
+                    $("#selectedLanguages").append("<span>" + language + "</spab>" + ", ");
+                });
+            }
+        });
+    </script>
+}
