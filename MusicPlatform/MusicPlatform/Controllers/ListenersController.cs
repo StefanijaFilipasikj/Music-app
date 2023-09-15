@@ -84,7 +84,7 @@ namespace MusicPlatform.Controllers
             {
                 db.Entry(listener).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Details", new { id = listener.Id });
+                return RedirectToAction("Index", "Home");
             }
             return View(listener);
         }

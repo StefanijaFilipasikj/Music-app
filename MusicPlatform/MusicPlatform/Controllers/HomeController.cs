@@ -14,14 +14,14 @@ namespace MusicPlatform.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         public ActionResult Index()
         {
-            var topArtists = db.Artists.OrderByDescending(artist => artist.Followers.Count()*0.5 + artist.Plays*0.5).Take(10).ToList();
-            var topSongs = db.Songs.OrderByDescending(song => song.Likes*0.5 + song.Plays*0.5).Take(10).ToList();
-            var topAlbums = db.Albums.OrderByDescending(album => album.Likes*0.5 + album.Plays*0.5).Take(10).ToList();
-            var popSongs = db.Songs.Where(song => song.Genre == "Pop").OrderByDescending(song => song.Likes * 0.5 + song.Plays * 0.5).Take(10).ToList();
-            var rapSongs = db.Songs.Where(song => song.Genre == "Rap").OrderByDescending(song => song.Likes * 0.5 + song.Plays * 0.5).Take(10).ToList();
-            var rbSongs = db.Songs.Where(song => song.Genre == "R&B").OrderByDescending(song => song.Likes * 0.5 + song.Plays * 0.5).Take(10).ToList();
-            var rockSongs = db.Songs.Where(song => song.Genre == "Rock").OrderByDescending(song => song.Likes * 0.5 + song.Plays * 0.5).Take(10).ToList();
-            var kpopSongs = db.Songs.Where(song => song.Genre == "K-pop").OrderByDescending(song => song.Likes * 0.5 + song.Plays * 0.5).Take(10).ToList();
+            var topArtists = db.Artists.OrderByDescending(artist => artist.Followers.Count()).Take(10).ToList();
+            var topSongs = db.Songs.OrderByDescending(song => song.Likes).Take(10).ToList();
+            var topAlbums = db.Albums.OrderByDescending(album => album.Likes).Take(10).ToList();
+            var popSongs = db.Songs.Where(song => song.Genre == "Pop").OrderByDescending(song => song.Likes).Take(10).ToList();
+            var rapSongs = db.Songs.Where(song => song.Genre == "Rap").OrderByDescending(song => song.Likes).Take(10).ToList();
+            var rbSongs = db.Songs.Where(song => song.Genre == "R&B").OrderByDescending(song => song.Likes).Take(10).ToList();
+            var rockSongs = db.Songs.Where(song => song.Genre == "Rock").OrderByDescending(song => song.Likes).Take(10).ToList();
+            var kpopSongs = db.Songs.Where(song => song.Genre == "K-pop").OrderByDescending(song => song.Likes).Take(10).ToList();
 
 
             var bestOf = new BestOfViewModel();

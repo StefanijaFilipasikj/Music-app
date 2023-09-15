@@ -102,7 +102,16 @@
             }
             <h1 class="artistName" style="text-align: center; font-size: 90px;">@Model.Name</h1>
             <p class="artistFollowers" style="text-align: center; font-size:30px;">
-                @Model.Followers.Count
+
+                <!-- +5050 is temporary (just to have a greater number) -->
+
+                @{
+                    int followers = Int32.Parse(@Model.Followers.Count.ToString());
+                    int result = followers + 5050;
+                }
+
+                @result
+
                 @if (Model.Followers.Count == 1)
                 {
                     <span>follower</span>
@@ -147,7 +156,6 @@
         }
     </p>
     <br />
-
 
 </body>
 </html>

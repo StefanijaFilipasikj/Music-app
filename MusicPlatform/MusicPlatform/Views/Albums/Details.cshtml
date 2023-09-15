@@ -51,15 +51,19 @@
             text-decoration: none;
             padding: 0 7px;
         }
-        .paginate_button:hover {
-            color: white;
-        }
+
+            .paginate_button:hover {
+                color: white;
+            }
+
         .highlightedRow {
             background-color: #212529;
         }
+
         .infoContainer {
             position: relative;
         }
+
         .tracklistContainer {
             position: absolute;
             top: 50%;
@@ -104,7 +108,14 @@
                     </dt>
 
                     <dd>
-                        @Html.DisplayFor(model => model.Likes)
+                        <!-- +1020 is temporary (just to have a greater number) -->
+
+                        @{
+                            int likes = Int32.Parse(@Model.Likes.ToString());
+                            int result = likes + 1020;
+                        }
+
+                        @result
                     </dd>
                 </div>
             </dl>
@@ -130,7 +141,7 @@
             </dl>
         </div>
 
-        
+
         <br /><hr /><br />
 
 
@@ -191,7 +202,7 @@
                             @if (User.IsInRole("Listener"))
                             {
                                 <td>
-                                    @if (item.LikesFromListeners.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                                    @if (item.LikesFromListeners.Where(l => l.Email == User.Identity.Name).Count() != 0)
                                     {
                                         using (Html.BeginForm("Unlike", "Songs", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
                                         {
@@ -229,10 +240,7 @@
         {
             @Html.ActionLink("Edit this album", "Edit", new { id = Model.Id }, new { @class = "btn btn-dark" })
         }
-        else
-        {
-            @Html.ActionLink("View All Albums", "Index", new { @class = "btn btn-dark" })
-        }
+
     </p>
 
     <br />
@@ -249,7 +257,7 @@
         var currentSongIndex = 0;
         var previousSongIndex = -1; // Initialize with an invalid index
         var isPlaying = false; // Flag to keep track of whether the song is currently playing
-
+        
         function onYouTubeIframeAPIReady() {
 
             var buttons = document.querySelectorAll(".audio-play-btn");
@@ -280,11 +288,11 @@
             e.onclick = function () {
                 r.getPlayerState() === YT.PlayerState.PLAYING || r.getPlayerState() === YT.PlayerState.BUFFERING ? (r.pauseVideo(), o(!1)) : (r.playVideo(), o(!0));
             };
-           var r = new YT.Player("youtube-player", {
+            var r = new YT.Player("youtube-player", {
                 height: "0",
                 width: "0",
                 videoId: songs[currentSongIndex].AudioURL,
-               playerVars: {
+                playerVars: {
                     autoplay: 0,
                     loop: 1
                 },
@@ -298,20 +306,20 @@
                             r.loadVideoById(songs[currentSongIndex].AudioURL);
                             r.playVideo();
                             isPlaying = true; // Set isPlaying to true when the next song starts playing
-                       }
+                        }
 
                         var previousHighlightedRow = document.querySelector(".highlightedRow");
                         if (previousHighlightedRow) {
-                           previousHighlightedRow.classList.remove("highlightedRow");
-                       }
+                            previousHighlightedRow.classList.remove("highlightedRow");
+                        }
 
                         var currentRow = document.getElementById("row-" + currentSongIndex);
                         currentRow.classList.add("highlightedRow");
                     }
                 }
-           });
+            });
         }
-
+        onYouTubeIframeAPIReady();
 
         (function ($) {
             $(document).ready(function () {

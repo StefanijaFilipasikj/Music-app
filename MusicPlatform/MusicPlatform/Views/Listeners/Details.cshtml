@@ -4,7 +4,7 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Listener Details</h2>
+<h4>Listener Details</h4>
 
 <div>
     <hr />
@@ -23,7 +23,7 @@
         </dt>
 
         <dd>
-            <img src="@Model.PhotoUrl" style="width: 100px;"/>
+            <img src="@Model.PhotoUrl" style="width: 100px; height: 100px; border-radius: 50%;"/>
         </dd>
 
         <dt>
@@ -33,7 +33,7 @@
         <dd>
             @Html.DisplayFor(model => model.Email)
         </dd>
-
+        <hr />
         <dt>
             Following
         </dt>

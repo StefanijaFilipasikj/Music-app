@@ -1,20 +1,19 @@
 ﻿@model MusicPlatform.Models.Comment
 
 <li class="comment" id="comment-@Model.Id" style="min-height: 50px;">
-    <img src="@Model.PhotoURL" style="width: 40px; height: 40px; border-radius: 50%;" />
-    <span style="vertical-align: top; display: inline-block; height: 45px;">
-        <b>@Model.Email</b>
-        <span>@Model.Content </span>
+    <img src="@Model.PhotoURL" style="width: 45px; height: 45px; border-radius: 50%; display: inline-block;" />
+    <span style="vertical-align: top; display: inline-block; max-width: 410px; min-height: 45px;">
+        <b>@Model.Email </b><span> @Model.Content </span>
+        @if (Model.Replies.Count > 0)
+        {
+            <button style="display: block; padding: 0; text-decoration: none; font-size: 14px;" class="btn btn-link show-replies-btn">&#11182; Show Replies</button>
+        }
     </span>
 
     <span class="actions">
         @if (User.IsInRole("Listener"))
         {
             <button style="font-size: 14px; height: 35px;" class="btn btn-dark reply-btn">Reply</button>
-        }
-        @if (Model.Replies.Count > 0)
-        {
-            <button style="display: block; padding: 0; margin-top: -23px; margin-left: 45px; text-decoration: none; font-size: 14px;" class="btn btn-link show-replies-btn">&#11182; Show Replies</button>
         }
     </span>
 

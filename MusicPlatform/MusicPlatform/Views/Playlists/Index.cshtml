@@ -20,6 +20,7 @@
     <table id="playlistsTable" class="table">
         <thead>
             <tr>
+                <th>Profile Picture</th>
                 <th>Author</th>
                 <th>Title</th>
                 <th>Audio</th>
@@ -31,6 +32,9 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td style="width: 180px;">
+                        <img src="@item.Listener.PhotoUrl" width="70" height="70" style="border-radius: 50%;"/>
+                    </td>
                     <td>
                         <a href="/Listeners/Details/@item.Listener.Id">@Html.DisplayFor(modelItem => item.Listener.Name)</a>
                     </td>
@@ -53,23 +57,7 @@
                         </button>
                     </td>
                     <td>
-                        @if (User.Identity.IsAuthenticated && item.Listener.Email == User.Identity.Name)
-                        {
-                            if (item.Title != "Liked Songs")
-                            {
-                                <a href="/Playlists/Edit/@item.Id" class="btn btn-dark">Edit</a>
-                                <a href="/Playlists/Details/@item.Id" class="btn btn-dark">Details</a>
-                                <button data-playlist-id="@item.Id" class="btn btn-dark js-delete">Delete</button>
-                            }
-                            else
-                            {
-                                <a href="/Playlists/Details/@item.Id" class="btn btn-dark">Details</a>
-                            }
-                        }
-                        else
-                        {
-                            <a href="/Playlists/Details/@item.Id" class="btn btn-dark">Details</a>
-                        }
+                        <a href="/Playlists/Details/@item.Id" class="btn btn-dark">Details</a>
                     </td>
                 </tr>
             }

@@ -36,7 +36,7 @@
 
                         <li>@Html.ActionLink("Edit My Profile", "Edit", "Listeners", new { area = "" }, new { @class = "nav-link" })</li>
                     }
-                    else
+                    @if (User.IsInRole("Artist"))
                     {
                         <li>@Html.ActionLink("My Profile", "Details", "Artists", new { area = "" }, new { @class = "nav-link" })</li>
                         <li>@Html.ActionLink("My Songs", "Index", "Songs", new { area = "" }, new { @class = "nav-link" })</li>

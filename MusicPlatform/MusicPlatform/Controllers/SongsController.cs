@@ -64,7 +64,8 @@ namespace MusicPlatform.Controllers
             if (User.IsInRole("Artist"))
             {
                 var songs = db.Songs.Include(s => s.Album).Include(s => s.Artist)
-                                               .Where(song => song.Artist.Email == email).ToList();
+                                               .Where(song => song.Artist.Email == email)
+                                               .ToList();
 
                 if (songs == null)
                 {

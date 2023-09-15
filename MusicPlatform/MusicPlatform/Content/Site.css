@@ -115,33 +115,3 @@ table.table.dataTable{
     left: 50%;
     transform: translate(-50%);
 }
-.confetti-piece {
-    width: 17px;
-    height: 6px;
-    position: absolute;
-    background-color: white;
-    animation: confetti 1s ease-in-out infinite;
-    transform-origin: top left;
-}
-.confetti-piece:hover {
-    animation-play-state: paused;
-}
-.confetti-piece:nth-child(1) {
-    left: 10%;
-    top: 10%;
-}
-.confetti-piece:nth-child(2) {
-    left: 20%;
-    top: 15%;
-}
-@keyframes confetti {
-    0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(300px) rotate(360deg);
-        opacity: 0;
-    }
-}

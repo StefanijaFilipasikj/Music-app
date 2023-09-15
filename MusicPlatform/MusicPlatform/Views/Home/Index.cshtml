@@ -13,6 +13,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
+            transition: filter 0.3s, opacity 0.3s;
         }
         .coverContainer {
             position: relative;
@@ -21,16 +22,17 @@
             height: 200px;
             overflow-x: hidden;
             margin: 30px;
+            transition: filter 0.3s, opacity 0.3s;
         }
         .coverContainer:hover img {
-            filter: brightness(50%);
+            filter: brightness(20%);
         }
         .coverContainer:hover .hoverText {
             display: block;
         }
         .hoverText {
             display: none;
-            width: 200px;
+            width: 190px;
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -69,35 +71,49 @@
         h3{
             margin-top: 30px;
         }
+        .trending::before {
+            content: "";
+            background-image: url( @Model.Trending.Album.AlbumArtURL );
+            filter: blur(3px), contrast(1px);
+            opacity: 0.5;
+            background-position: -2%, -2%;
+            background-size: 34%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: filter 0.3s, opacity 0.3s;
+        }
         .trending {
+            position: relative;
             color: white;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
             height: 400px;
             width: 100%;
             text-align: center;
-            background-image: url( @Model.Trending.Album.AlbumArtURL );
-            background-size: 110%;
-            background-position: -10px -10px;
-            backdrop-filter: blur(50px) opacity(50%);
+            vertical-align: middle;
+            padding: 50px;
+        }
+        .trending:hover::before{
+            filter: blur(1px);
+            opacity: 0.3;
+        }
+        .trending:hover{
+            opacity: 1;
+            border: 1px solid #ffffff25;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <main>
-        <a href="/Songs/Details/@Model.Trending.Id" class="trending btn btn-outline-dark">
-            
-            <div class="confetti-piece"></div>
-            <div class="confetti-piece"></div>
-            <div class="confetti-piece"></div>
-            
-            <img src="@Model.Trending.Album.AlbumArtURL" style="height:100%; margin-right: 100px;" />
-            <div style="display: inline-block; vertical-align: middle;">
-                <h1>Trending</h1>
-                <h1 style="font-size: 48px;">@Model.Trending.Title</h1>
-                <h2>from @Model.Trending.Album.Title</h2>
-                <h2>by @Model.Trending.Artist.Name</h2>
-            </div>
+        <a href="/Songs/Details/@Model.Trending.Id" class="trending btn">            
+            <h3 style="font-size: 40px;">Trending</h3>
+            <br />
+            <h1 style="font-size: 70px;">@Model.Trending.Title</h1>
+            <h2 style="font-size:50px;">by @Model.Trending.Artist.Name</h2>
         </a>
+
         <hr />
         <div style="text-align: center;">
             <div>
@@ -145,6 +161,9 @@
                 </ul>
             </div>
             <hr />
+            <br />
+            <br />
+            <hr />
             <div>
                 <h3>Pop Songs</h3>
                 <ul class="video-slider">
@@ -191,9 +210,9 @@
             </div>
             <hr />
             <div>
-                <h3>Rock Songs</h3>
+                <h3>K-pop Songs</h3>
                 <ul class="video-slider">
-                    @foreach (var song in Model.RockSongs)
+                    @foreach (var song in Model.KPopSongs)
                     {
                         <li class="coverContainer">
                             <a href="Songs/Details/@song.Id">
@@ -206,9 +225,9 @@
             </div>
             <hr />
             <div>
-                <h3>K-pop Songs</h3>
+                <h3>Rock Songs</h3>
                 <ul class="video-slider">
-                    @foreach (var song in Model.KPopSongs)
+                    @foreach (var song in Model.RockSongs)
                     {
                         <li class="coverContainer">
                             <a href="Songs/Details/@song.Id">
@@ -224,7 +243,6 @@
     </main>
 </body>
 </html>
-
 @section scripts{
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
@@ -238,18 +256,6 @@
                     slidesToShow: 5,
                     slidesToScroll: 1
                 });
-            });
-
-            // Add JavaScript/jQuery for confetti animation here
-            $(".trending").hover(function () {
-                // Create and append confetti pieces on hover
-                for (let i = 0; i < 20; i++) {
-                    const confettiPiece = $("<div>").addClass("confetti-piece");
-                    $(".trending").append(confettiPiece);
-                }
-            }, function () {
-                // Remove confetti pieces on hover out
-                $(".confetti-piece").remove();
             });
         })(jQuery);
     </script>

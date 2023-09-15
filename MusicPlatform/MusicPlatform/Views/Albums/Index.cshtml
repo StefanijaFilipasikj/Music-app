@@ -90,7 +90,7 @@
                             </button>
                         </td>
                         <td>
-                            @if (item.LikesFromListeners.FirstOrDefault(l => l.Email == ViewBag.Email) != null)
+                            @if (item.LikesFromListeners.Where(l => l.Email == ViewBag.Email).Count() != 0)
                             {
                                 using (Html.BeginForm("Unlike", "Albums", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
                                 {
@@ -113,12 +113,19 @@
                     }
                     else
                     {
-                        <td>
+                        <td  style="width: 180px;">
                             <span style="color: white;">
-                                @Html.DisplayFor(modelItem => item.Likes)
+                                <!-- +1020 is temporary (just to have a greater number) -->
+
+                                @{
+                                    int likes = Int32.Parse(@item.Likes.ToString());
+                                    int result = likes + 1020;
+                                }
+
+                                @result
                             </span>
                         </td>
-                        <td>
+                        <td style="width: 280px;">
                             <a href="/Albums/Edit/@item.Id" class="btn btn-dark">Edit</a>
                             <button data-album-id="@item.Id" class="btn btn-dark js-delete">Delete</button>
                             <a href="/Albums/Details/@item.Id" class="btn btn-dark">Details</a>
