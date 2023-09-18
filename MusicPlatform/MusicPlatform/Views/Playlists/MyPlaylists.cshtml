@@ -157,20 +157,35 @@
 
                 $("#playlistsTable .js-delete").on("click", function () {
                     var button = $(this);
-                    bootbox.confirm("Are you sure you want to delete this playlist?", function (result) {
-                        if (result) {
-                            $.ajax({
-                                url: "/Playlists/Delete/" + button.attr("data-playlist-id"),
-                                method: "POST",
-                                success: function () {
-                                    table.row(button.parents("tr")).remove().draw();
-                                },
-                                error: function (err) {
-                                    console.log(err);
-                                }
-                            })
+                    bootbox.confirm({
+                        message: "Are you sure you want to delete this playlist?",
+                        buttons: {
+                            confirm: {
+                                label: 'Delete',
+                                className: 'btn-danger'
+                            },
+                            cancel: {
+                                label: 'Cancel',
+                                className: 'btn-secondary'
+                            }
+                        },
+                        closeButton: false,
+                        callback: function (result) {
+                            if (result) {
+                                $.ajax({
+                                    url: "/Playlists/Delete/" + button.attr("data-playlist-id"),
+                                    method: "POST",
+                                    success: function () {
+                                        table.row(button.parents("tr")).remove().draw();
+                                    },
+                                    error: function (err) {
+                                        console.log(err);
+                                    }
+                                });
+                            }
                         }
                     });
+                    return false;
                 });
             });
 

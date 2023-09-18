@@ -163,84 +163,84 @@
 @section scripts{
     <script>
         const photoEditor = document.querySelector('.photo-editor');
-const userPhoto = document.getElementById('user-photo');
-const zoomRange = document.getElementById('zoom-range');
+        const userPhoto = document.getElementById('user-photo');
+        const zoomRange = document.getElementById('zoom-range');
 
-let currentScale = 1;
-let currentX = 0;
-let currentY = 0;
-let storageKey = ""; // Unique storage key for each artist
+        let currentScale = 1;
+        let currentX = 0;
+        let currentY = 0;
+        let storageKey = ""; // Unique storage key for each artist
 
-// Function to load the image state from localStorage
-function loadImageState() {
-  const savedState = localStorage.getItem(storageKey);
-  if (savedState) {
-    const { scale, translateX, translateY } = JSON.parse(savedState);
-    currentScale = scale;
-    currentX = translateX;
-    currentY = translateY;
-    updateImageTransform();
-  }
-}
+        // Function to load the image state from localStorage
+        function loadImageState() {
+        const savedState = localStorage.getItem(storageKey);
+        if (savedState) {
+            const { scale, translateX, translateY } = JSON.parse(savedState);
+            currentScale = scale;
+            currentX = translateX;
+            currentY = translateY;
+            updateImageTransform();
+        }
+        }
 
-// Function to save the current image state to localStorage
-function saveImageState() {
-  localStorage.setItem(storageKey, JSON.stringify({
-    scale: currentScale,
-    translateX: currentX,
-    translateY: currentY
-  }));
-}
+        // Function to save the current image state to localStorage
+        function saveImageState() {
+            localStorage.setItem(storageKey, JSON.stringify({
+                scale: currentScale,
+                translateX: currentX,
+                translateY: currentY
+            }));
+        }
 
-// Load the image state when the page is ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Set the unique storage key based on the artist's identity
-  storageKey = "imageState_" + "@Model.Email"; // You can use a unique identifier like email or ID
-  loadImageState();
-});
+        // Load the image state when the page is ready
+        document.addEventListener('DOMContentLoaded', () => {
+        // Set the unique storage key based on the artist's identity
+        storageKey = "imageState_" + "@Model.Email"; // You can use a unique identifier like email or ID
+        loadImageState();
+        });
 
-zoomRange.addEventListener('input', () => {
-  currentScale = parseFloat(zoomRange.value);
-  updateImageTransform();
-  saveImageState(); // Save the image state when zoom changes
-});
+        zoomRange.addEventListener('input', () => {
+        currentScale = parseFloat(zoomRange.value);
+        updateImageTransform();
+        saveImageState(); // Save the image state when zoom changes
+        });
 
-function updateImageTransform() {
-  userPhoto.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
-}
+        function updateImageTransform() {
+        userPhoto.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
+        }
 
-// Enable dragging the image
-let isDragging = false;
-let startMouseX, startMouseY, startElementX, startElementY;
+        // Enable dragging the image
+        let isDragging = false;
+        let startMouseX, startMouseY, startElementX, startElementY;
 
-userPhoto.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  startMouseX = e.clientX;
-  startMouseY = e.clientY;
-  startElementX = currentX;
-  startElementY = currentY;
-});
+        userPhoto.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = e.clientX;
+            startMouseY = e.clientY;
+            startElementX = currentX;
+            startElementY = currentY;
+        });
 
-document.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  const deltaX = e.clientX - startMouseX;
-  const deltaY = e.clientY - startMouseY;
-  currentX = startElementX + deltaX;
-  currentY = startElementY + deltaY;
-  updateImageTransform();
-});
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startMouseX;
+            const deltaY = e.clientY - startMouseY;
+            currentX = startElementX + deltaX;
+            currentY = startElementY + deltaY;
+            updateImageTransform();
+        });
 
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
 
-document.addEventListener('mouseleave', () => {
-  isDragging = false;
-});
+        document.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
 
-// Add an event listener to save the image state when the user navigates away from the page
-window.addEventListener('beforeunload', () => {
-  saveImageState();
-});       
-    </script>        
+        // Add an event listener to save the image state when the user navigates away from the page
+        window.addEventListener('beforeunload', () => {
+            saveImageState();
+        });
+    </script>       
 }
