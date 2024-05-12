@@ -228,6 +228,10 @@
                 var button = $(this);
                 bootbox.confirm({
                     message: "Are you sure you want to delete this song?",
+                    animate: true,
+                    backdrop: true,
+                    closeButton: false,
+                    centerVertical: true,
                     buttons: {
                         confirm: {
                             label: 'Delete',
@@ -235,10 +239,9 @@
                         },
                         cancel: {
                             label: 'Cancel',
-                            className: 'btn-secondary'
+                            className: 'btn-dark'
                         }
                     },
-                    closeButton: false,
                     callback: function (result) {
                         if (result) {
                             $.ajax({

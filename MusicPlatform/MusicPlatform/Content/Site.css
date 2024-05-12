@@ -1,18 +1,13 @@
-﻿/* Set padding to keep content from hitting the edges */
-.body-content {
+﻿.body-content {
     margin-top: 15px;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
 .dl-horizontal dt {
     white-space: normal;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
 input,
 select,
 textarea {
@@ -23,20 +18,24 @@ ul {
     list-style-type: none;
 }
 
-body{
+body {
     background-color: #131313;
     color: white;
 }
-.navbar{
+
+.navbar {
     background-color: black;
 }
+
 a {
     text-decoration: none;
     color: white;
 }
-a:hover {
-    color: white;
-}
+
+    a:hover {
+        color: white;
+    }
+
 .paginate_button a {
     color: white;
     text-decoration: none;
@@ -49,16 +48,7 @@ a:hover {
     height: 37px;
 }
 
-button.bootbox-close-button.close {
-    border: none;
-}
 
-.bootbox-close-button {
-    display: none;
-}
-.modal-content {
-    background-color: black;
-}
 .btn-no-style {
     background-color: inherit;
     color: inherit;
@@ -70,16 +60,11 @@ th.sorting, th.sorting_asc, th.sorting_desc {
     border-bottom: 1px solid #272727;
 }
 
-select.form-control.input-sm, select.form-control.input-sm > option, input.form-control.input-sm, select, input{
-    background-color: #131313;
-    color: inherit;
-    border: 1px solid white;
-    border-radius: 3px;
-}
-table.table.dataTable{
+table.table.dataTable {
     border: none;
 }
-.td_title, .td_artist, .td_album{
+
+.td_title, .td_artist, .td_album {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -105,13 +90,88 @@ table.table.dataTable{
 .td_albumart {
     width: 140px;
 }
+
 .imageRelativeContainer {
     display: inline-block;
     position: relative;
     overflow: hidden;
 }
+
 .imageAbsolute {
     position: absolute;
     left: 50%;
     transform: translate(-50%);
+}
+
+
+
+#Language, #Genre, #AddSong {
+    background: rgba(0,0,0,0);
+    color: rgb(108,117,125);
+    padding: 5px;
+    width: 100%;
+    border: 1px solid rgb(31,34,37);
+    border-radius: 6px;
+}
+
+#AddSong {
+    color: white;
+    min-width: 100%;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(31,34,37);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(108,117,125,0.5);
+    border-radius: 6px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(108,117,125,1);
+        border-radius: 6px;
+    }
+
+option:hover {
+    background-color: rgba(108,117,125,0.1);
+}
+
+option:checked, option:focus, option:active {
+    background: linear-gradient(rgb(31,34,37), rgb(31,34,37));
+    background-color: rgb(31,34,37) !important;
+    color: rgb(206 206 206) !important;
+}
+
+select:focus {
+    outline: 3px solid rgba(31,34,37,0.5) !important;
+    border: none;
+}
+
+.bootbox.modal.fade.show .modal-dialog {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+
+button.bootbox-close-button.close {
+    border: none;
+}
+
+.bootbox-close-button {
+    display: none;
+}
+
+.modal-content {
+    background-color: black;
+    border: 1px solid white;
+}
+
+.modal {
+    background-color: rgba(0,0,0,0.5);
 }

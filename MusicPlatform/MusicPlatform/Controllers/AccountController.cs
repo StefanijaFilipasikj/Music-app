@@ -152,6 +152,8 @@ namespace MusicPlatform.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                user.EmailConfirmed = true;
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -163,11 +165,11 @@ namespace MusicPlatform.Controllers
 
                     if (role.Equals("Artist"))
                     {
-                        return RedirectToAction("Create", "Artists");
+                        return RedirectToAction("Create", "Artists", new { email = model.Email });
                     }
                     else //Listener
                     {
-                        return RedirectToAction("Create", "Listeners");
+                        return RedirectToAction("Create", "Listeners", new { email = model.Email });
                     }
 
                     //return RedirectToAction("Index", "Home");

@@ -7,18 +7,21 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/modernizr")
-    @Styles.Render("~/Content/custom.css")
+    @Styles.Render("~/Content/Site.css")
+
+    <link href="~/Content/Site.css" rel="stylesheet" />
 
 
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark" style="background-color: black;">
         <div class="container">
-            @Html.ActionLink("Crescendo", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            @Html.ActionLink("♫Pianissimo", "Index", "Home", new { area = "" }, new { style="letter-spacing: 0.1em;", @class = "navbar-brand display-1" })
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

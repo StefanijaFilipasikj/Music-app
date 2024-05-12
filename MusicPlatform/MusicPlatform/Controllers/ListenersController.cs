@@ -37,9 +37,10 @@ namespace MusicPlatform.Controllers
         }
 
         // GET: Listeners/Create
-        public ActionResult Create()
+        public ActionResult Create(string email)
         {
-            return View();
+            var listener = new Listener { Email = email };
+            return View(listener);
         }
 
         // POST: Listeners/Create

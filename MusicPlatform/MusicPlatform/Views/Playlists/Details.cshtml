@@ -106,6 +106,10 @@
                     <th>Artist</th>
                     <th>Play</th>
                     <th>Like</th>
+                    @if (User.Identity.IsAuthenticated && Model.Listener.Email == User.Identity.Name && Model.Title != "Liked Songs")
+                    {
+                        <th>Remove</th>
+                    }
                     <th>See More</th>
                 </tr>
             </thead>
@@ -148,6 +152,16 @@
                                 }
                             }
                         </td>
+                        @if (User.Identity.IsAuthenticated && Model.Listener.Email == User.Identity.Name && Model.Title != "Liked Songs")
+                        {
+                            <td>
+                                @using (Html.BeginForm("RemoveSongFromPlaylist", "Playlists", new { selectedSongId = item.Id, playlistId = Model.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-dark">&#10005;</button>
+                                }
+                            </td>
+                        }
                         <td>
                             <a href="/Songs/Details/@item.Id" class="btn btn-dark">Details</a>
                         </td>
@@ -157,44 +171,24 @@
         </table>
     </div>
 
-
-
-
-
-
-
-    <br />
-
     @if (User.Identity.IsAuthenticated && Model.Listener.Email == User.Identity.Name && Model.Title != "Liked Songs")
     {
-        <div style="display: inline-block; min-width: 400px; border: 1px solid #cececeff; padding: 20px; border-radius: 4px;">
+        <br /><br /><br />
+        <h5 class="text-center mb-1">Add More Songs To Your Playlist</h5>
+        <hr />
+
+        <div class="row">
             @using (Html.BeginForm("AddSongToPlaylist", "Playlists", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
-                @Html.DropDownList("selectedSongId", (SelectList)ViewBag.Songs, "Select a Song", new { @class = "form-control btn btn-dark" })
-                <br />
                 @Html.Hidden("playlistId", Model.Id)
-                <br />
-                <button class="btn btn-dark" type="submit">Add</button>
-            }
-        </div>
 
-        <div style="display: inline-block; min-width: 400px; border: 1px solid #cececeff; padding: 20px; border-radius: 4px;">
-            @using (Html.BeginForm("RemoveSongFromPlaylist", "Playlists", FormMethod.Post))
-            {
-                @Html.AntiForgeryToken()
-                @Html.DropDownList("selectedSongId", new SelectList(Model.Songs, "Id", "Title"), "Select a Song", new { @class = "form-control btn btn-dark" })
-                <br />
-                @Html.Hidden("playlistId", Model.Id)
-                <br />
-                <button class="btn btn-dark" type="submit">Remove</button>
+                @Html.DropDownList("selectedSongId", (SelectList)ViewBag.Songs, "Select a Song", new { size = 10, id = "AddSong", style = "min-width: 100%;", @class = "form-control btn btn-dark mb-1 col-12" })
+                <button class="btn btn-dark mb-2 col-12" type="submit">Add To Playlist</button>
             }
         </div>
     }
-
-
     <br /><br />
-
 </body>
 </html>
 

@@ -4,59 +4,97 @@
     ViewBag.Title = "Create";
 }
 
-@using (Html.BeginForm()) 
-{
-    @Html.AntiForgeryToken()
-    
-<div class="form-horizontal">
-    <h4>Create a new album</h4>
-    <hr />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
-            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+<br /><hr class="mt-3" />
+<main aria-labelledby="title" class="mt-2 d-flex justify-content-center">
+    <div style="background: url('https://www.thisisdarkness.com/wp-content/uploads/2018/03/studio-2.jpg'); background-size: cover; background-position-y: 6rem;">
+        <div class="rounded-2 col-5 p-5" style="width: 80rem; min-height: 37rem; background-color: rgba(0,0,0,0.9) ">
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                    <div class="d-flex justify-content-between">
+                        <h4>New Album</h4>
+                        <a class="btn btn-outline-dark text-white pt-1" href="@Request.Headers["Referer"]">Back</a>
+                    </div>
+                    <hr /><br />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group mb-3 d-flex justify-content-between">
+                        <div class="col-6">
+                            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { id = "Title", placeholder = "Album Title...", style = "min-width: 100%; filter: opacity(80%);", @class = "form-control btn btn-outline-dark rounded-0 mb-3" } })
+                            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+
+                            @Html.TextAreaFor(model => model.Description, new { id = "Description", placeholder = "Album Description...", style = "min-width: 100%; filter: opacity(80%);", @class = "form-control btn btn-outline-dark rounded-0", rows = 10 })
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-5">
+                            @Html.EditorFor(model => model.AlbumArtURL, new { htmlAttributes = new { id = "AlbumArtURL", placeholder = "Album Art Url...", style = "min-width: 100%; filter: opacity(80%);", @class = "form-control btn btn-outline-dark rounded-0 mb-3" } })
+                            @Html.ValidationMessageFor(model => model.AlbumArtURL, "", new { @class = "text-danger" })
+                            <div id="photoPreview" style="height: 15.85rem; width: 100%; border: 1px solid rgb(255, 255, 255, 0.5); filter: opacity(20%); background: url('https://i.pinimg.com/736x/d9/02/20/d90220aa02234c89c188c451437d0bca.jpg'); background-size: 75%; background-position-y: center; background-position-x: center;"></div>
+                        </div>
+                    </div>
+
+
+                    @Html.HiddenFor(model => model.ArtistId)
+
+                    <div class="form-group mt-4">
+                        <div>
+                            <button type="submit" value="Create" class="btn btn-outline-dark text-white form-control">Create</button>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
+</main>
+<hr />
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextAreaFor(model => model.Description, new { @class = "form-control btn btn-dark", rows = 5 })
-            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.AlbumArtURL, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.AlbumArtURL, new { htmlAttributes = new { @class = "form-control btn btn-dark" } })
-            @Html.ValidationMessageFor(model => model.AlbumArtURL, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-md-10">
-            @Html.HiddenFor(model => model.ArtistId)
-            @Html.ValidationMessageFor(model => model.ArtistId, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <br />
-            <input type="submit" value="Create" class="btn btn-dark" />
-        </div>
-    </div>
-</div>
-}
-
-<div>
-    <br />
-    <a class="btn btn-dark" href="@Request.Headers["Referer"]">Back</a>
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $('#Title, #Description, #AlbumArtURL').change(function () {
+            var source = $(this).val();
+
+            if (source !== "") {
+                $(this).removeClass("btn-outline-dark");
+                $(this).addClass("btn-dark");
+            } else {
+                $(this).removeClass("btn-dark");
+                $(this).addClass("btn-outline-dark");
+            }
+        });
+
+
+        $('#AlbumArtURL').change(function () {
+            var source = $(this).val();
+            var empty = false;
+
+            try {
+                new URL(source);
+            } catch (err) {
+                empty = true;
+                source = "https://i.pinimg.com/736x/d9/02/20/d90220aa02234c89c188c451437d0bca.jpg";
+            }
+
+            var url = "url('" + source + "')";
+            $('#photoPreview').css("background", url);
+
+            if (empty) {    
+                $('#photoPreview').css("border", "1px solid rgb(255, 255, 255, 0.5)");
+                $('#photoPreview').css("filter", "opacity(20%)");
+                $('#photoPreview').css("background-size", "75%");
+            } else {
+                $('#photoPreview').css("border", "1px solid rgb(255, 255, 255, 0.1)");
+                $('#photoPreview').css("filter", "opacity(100%)");
+                $('#photoPreview').css("background-size", "cover");
+            }
+
+            $('#photoPreview').css("background-position-y", "center");
+            $('#photoPreview').css("background-position-x", "center");
+        });
+    </script>
 }

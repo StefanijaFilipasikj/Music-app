@@ -355,8 +355,8 @@ namespace MusicPlatform.Controllers
         {
             if (ModelState.IsValid)
             {
-                var videoId = GetIdFromUrl(song.VideoURL);
-                var audioId = GetIdFromUrl(song.AudioURL);
+                var videoId = GetIdFromUrl("https://www.youtube.com/watch?v=" + song.VideoURL);
+                var audioId = GetIdFromUrl("https://www.youtube.com/watch?v=" + song.AudioURL);
 
                 song.VideoURL = videoId;
                 song.AudioURL = audioId;

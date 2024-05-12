@@ -15,6 +15,13 @@
         .btn-fu{
             width: 90px;
         }
+        .btn-custom {
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .btn-custom:hover {
+            filter: opacity(80%);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +62,7 @@
                             using (Html.BeginForm("Unfollow", "Artists", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
                             {
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-danger btn-fu">Unfollow</button>
+                                <button type="submit" class="btn text-white btn-custom" style="background-color: #550216; min-width: 6rem;">Unfollow</button>
                             }
                         }
                         else
@@ -63,7 +70,7 @@
                             using (Html.BeginForm("Follow", "Artists", new { id = item.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
                             {
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-primary btn-fu">Follow</button>
+                                <button type="submit" class="btn text-white btn-custom" style="background-color: #041e3d; min-width: 6rem;">Follow</button>
                             }
                         }
                     </td>
