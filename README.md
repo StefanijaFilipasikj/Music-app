@@ -7,11 +7,11 @@ After Registering as a new "Listener" or "Artist", you can add your name and pro
 
 If you registered as an "Artist", you can then position your profile picture to your liking
 
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/9c5298c1-dd81-46a4-8e76-29a8d2c98855
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/c4bbfbb5-39a1-4dd8-b1a2-1b698608be77
 
 You can also create new albums and add songs to them
 
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/6200dafa-a00c-467d-9f71-0eedf4eef14c
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/f514367e-de24-4f3e-8366-77abda0958b1
 
 <br />
 
@@ -20,7 +20,7 @@ The explore page gives an overview on the most popular Songs, Artists and Albums
 
 Each card on the explore page redirects to the details page of that Song, Artist or Album.
 
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/fbfefbd9-6e62-4be8-bc48-827404fb4793
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/f6000894-36c2-453b-9086-d8ab8e5b5371
 
 <br />
 
@@ -31,25 +31,25 @@ In the Song details page you can listen to the song or watch the video, read the
 
 If you are a "Listener" you can also add comments on the song and reply to other comments.
 
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/a53edc70-d640-4c7e-b8ce-5598dc503be3
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/372a71c5-74af-42e0-bd7d-7ce6e1ea2f20
 
 ### Album Details :loud_sound:	
 
 In the Album details page you can listen to the whole album or watch all of the videos, see the number of likes or click the links to learn more about each song or about the artist
-  
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/a56df395-b707-4661-b7a4-42a4567e2cd8
+
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/d32e09dc-0187-46dc-bf26-3245ee2f3b22
 
 ### Playlist Details :loud_sound:	
 
 In the Playlist details page you can listen to the whole playlist or watch all of the videos or click the links to learn more about each song or about the artists.
 
 If the playlist was created by you, you can also add and remove songs from it (except your LikedSongs playilst where a song gets added when you 'like' it and gets removed when you 'dislike' it).
-  
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/6edf89bc-f7cb-4747-88aa-fb7e3e976f76
+
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/0e44b134-c8c2-4e16-928e-8bf80aa7ad9e
 
 <br />
 
 ## Index Pages :loud_sound:	
 If you want to browse through all the songs, albums, playlist or artists you can do that from their index pages. You can search through them, like/unlike them, play the audio or video in pop-up windows, follow/unfollow the artists...
 
-https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/c9f03976-9870-403e-853c-53edb9e02f80	
+https://github.com/StefanijaFilipasikj/MusicApp/assets/127665193/e7f3a60b-fe27-4f33-beff-36af317d299f
